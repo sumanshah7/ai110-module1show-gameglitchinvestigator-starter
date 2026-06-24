@@ -25,28 +25,32 @@ It wrote the code, ran away, and now the game is unplayable.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+- [x] **Describe the game's purpose.** A Streamlit number-guessing game: the app picks a secret number inside a range that depends on the chosen difficulty (Easy 1–20, Normal 1–100, Hard 1–50), and the player has a limited number of attempts to guess it. After each guess the game gives a "Too High" / "Too Low" hint and updates a running score.
+- [x] **Detail which bugs you found.**
+  1. **Secret out of range** — the secret was generated once and never regenerated when the difficulty changed, so an Easy/Hard game could hold a Normal-range secret.
+  2. **Backwards hints** — "Too High" told you to go HIGHER (and the secret was being coerced to a string on some attempts, so numbers were compared as text).
+  3. **Dead Submit button** — "New Game" reset attempts and the secret but not `status`, so after a win/loss the next rerun hit `st.stop()` and Submit did nothing until a full page refresh.
+- [x] **Explain what fixes you applied.** Regenerated the secret whenever the game loads or difficulty changes; corrected the hint directions and removed the `str()` coercion so comparisons stay integer; reset `status` (and score/history) in the New Game handler. Core logic was refactored out of `app.py` into `logic_utils.py` so it could be unit-tested.
 
 ## 📸 Demo Walkthrough
 
-Describe your fixed game in numbered steps so a reader can follow along without watching a video:
+A sample game on **Normal** difficulty (range 1–100, secret = 26):
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+1. User enters a guess of `10` → game returns "📈 Too low — go HIGHER!"
+2. User enters a guess of `60` → game returns "📉 Too high — go LOWER!"
+3. User enters a guess of `30` → game returns "📉 Too high — go LOWER!"
+4. Score updates after each guess and the "Attempts left" counter decreases.
+5. User enters a guess of `26` → game returns "🎉 Correct!", shows balloons, reports the final score, and locks the board.
+6. User clicks **New Game 🔁** → a fresh secret is drawn and the Submit button responds immediately (no page refresh needed).
 
 **Screenshot** *(optional)*: <!-- Insert a screenshot of your fixed, winning game here -->
 
 ## 🧪 Test Results
 
 ```
-# Paste your pytest output here, e.g.:
-# pytest tests/
-# ========================= X passed in 0.XXs =========================
+$ pytest -q
+.....................                                                    [100%]
+21 passed in 0.02s
 ```
 
 ## 🚀 Stretch Features
